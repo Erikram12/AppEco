@@ -1,0 +1,3 @@
+0 vacio
+1 aluminio
+2 plastico

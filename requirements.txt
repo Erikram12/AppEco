@@ -1,0 +1,83 @@
+# ===========================================
+# DEPENDENCIAS PARA APLECCO - SISTEMA DE RECICLAJE INTELIGENTE
+# ===========================================
+# Compatible con Python 3.11.2
+# Optimizado para Raspberry Pi 4B 8GB y Windows
+
+# ===========================================
+# DEPENDENCIAS PRINCIPALES
+# ===========================================
+
+# Firebase Admin SDK - Para conexión con Firebase
+firebase-admin==6.4.0
+
+# MQTT Client - Para comunicación con sensores
+paho-mqtt==1.6.1
+
+# OpenCV - Para procesamiento de imágenes y cámara
+opencv-python==4.8.1.78
+
+# NumPy - Para operaciones matemáticas (requerido por OpenCV y TensorFlow)
+numpy==1.24.3
+
+# Pygame - Para reproducción de audio
+pygame==2.5.2
+
+# Smart Card - Para lectura de tarjetas NFC
+pyscard==2.1.1
+
+# ===========================================
+# DEPENDENCIAS DE IA (TensorFlow)
+# ===========================================
+
+# TensorFlow Lite Runtime - Optimizado para Raspberry Pi
+# Para Raspberry Pi 4B (ARM64):
+tflite-runtime==2.14.0
+
+# TensorFlow completo - Para desarrollo en Windows
+# Comentado para Raspberry Pi, descomenta para Windows:
+# tensorflow==2.14.0
+
+# ===========================================
+# DEPENDENCIAS DE SISTEMA
+# ===========================================
+
+# Requests - Para peticiones HTTP (si es necesario)
+requests==2.31.0
+
+# Pillow - Para procesamiento de imágenes adicional
+Pillow==10.0.1
+
+# ===========================================
+# DEPENDENCIAS OPCIONALES
+# ===========================================
+
+# Para desarrollo y debugging:
+# pytest==7.4.3
+# black==23.9.1
+# flake8==6.1.0
+
+# ===========================================
+# NOTAS DE INSTALACIÓN
+# ===========================================
+# 
+# EN WINDOWS (Desarrollo):
+# 1. pip install -r requirements.txt
+# 2. Descomenta tensorflow==2.14.0 si usas modelo Keras
+# 3. Instala drivers NFC si es necesario
+#
+# EN RASPBERRY PI 4B:
+# 1. sudo apt update && sudo apt upgrade
+# 2. sudo apt install python3-pip python3-venv
+# 3. sudo apt install libopencv-dev python3-opencv
+# 4. sudo apt install libasound2-dev portaudio19-dev
+# 5. sudo apt install pcscd libpcsclite-dev
+# 6. pip3 install -r requirements.txt
+# 7. Para NFC: sudo systemctl enable pcscd && sudo systemctl start pcscd
+#
+# VERSIONES ESPECÍFICAS:
+# - Python: 3.11.2 (ambos entornos)
+# - OpenCV: 4.8.1.78 (compatible con RPi 4B)
+# - TensorFlow Lite: 2.14.0 (optimizado para ARM64)
+# - Firebase Admin: 6.4.0 (estable)
+# - MQTT: 1.6.1 (compatible con SSL)
