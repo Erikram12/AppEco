@@ -15,7 +15,7 @@ from services.mqtt_service import MQTTService
 from services.nfc_service import NFCService
 from services.camera_service import CameraService
 from ui.ui_components import UIComponents
-from config.config import SESSION_DURATION
+from config.config import SESSION_DURATION, POINTS_CLAIM_TIMEOUT
 
 
 class ReciclajeApp:
@@ -39,7 +39,7 @@ class ReciclajeApp:
         self.pending_points = 0  # Puntos pendientes de otorgar
         self.pending_material_time = 0  # Timestamp del material pendiente
         self.pending_image_path = None  # Ruta de la imagen del material pendiente
-        self.pending_timeout = 30  # 30 segundos de timeout para material pendiente
+        self.pending_timeout = POINTS_CLAIM_TIMEOUT  # Timeout para reclamar puntos antes del reinicio
         self.detection_thread = None
 
         # Inicializar componentes de UI
@@ -91,7 +91,7 @@ class ReciclajeApp:
     def _start_system(self):
         """Inicia el sistema principal"""
         self.is_running = True
-        self.ui.update_status("🟢 Sistema iniciado - Cámara siempre activa, detección con confianza ≥ 95%", "success")
+        self.ui.update_status(f"🟢 Sistema iniciado - Cámara siempre activa, detección con confianza ≥ 95% - Timeout: {POINTS_CLAIM_TIMEOUT}s", "success")
         
         # Iniciar detección continua de materiales
         self._start_continuous_detection()
@@ -122,20 +122,12 @@ class ReciclajeApp:
                     # Hay material pendiente, verificar timeout
                     current_time = time.time()
                     if (current_time - self.pending_material_time) > self.pending_timeout:
-                        # Timeout alcanzado, limpiar material pendiente
-                        print(f"⏰ Timeout de material pendiente: {self.pending_material}")
+                        # Timeout alcanzado, reiniciar sistema
+                        print(f"⏰ Timeout de puntos no reclamados: {self.pending_material} - Reiniciando sistema")
+                        self.ui.update_status(f"⏰ Tiempo agotado para reclamar {self.pending_material} - Reiniciando sistema...", "warning")
                         
-                        # Eliminar imagen pendiente
-                        if self.pending_image_path:
-                            self.camera_service.delete_image(self.pending_image_path)
-                        
-                        self.pending_material = None
-                        self.pending_points = 0
-                        self.pending_material_time = 0
-                        self.pending_image_path = None
-                        self.ui.clear_pending_material()
-                        self.ui.update_status("⏰ Material pendiente expirado - Detectando cambios...", "warning")
-                        self.ui.update_detection_status("🔄 Cámara activa - Detectando cambios...", "#3498db")
+                        # Reiniciar sistema completo
+                        self._restart_system()
                 
                 # Pausa muy corta para detección en tiempo real
                 time.sleep(0.1)  # 100ms para detección en tiempo real
@@ -167,7 +159,7 @@ class ReciclajeApp:
         self.pending_image_path = image_path
         
         # Actualizar UI
-        self.ui.update_status(f"♻️ {material.upper()} detectado! Pase su tarjeta NFC para recibir {points} puntos", "success")
+        self.ui.update_status(f"♻️ {material.upper()} detectado! Pase su tarjeta NFC para recibir {points} puntos (Tiempo límite: {POINTS_CLAIM_TIMEOUT}s)", "success")
         self.ui.update_pending_material(material, points)
         self.ui.log_material(material, points)
         
@@ -272,7 +264,38 @@ class ReciclajeApp:
         else:
             self.ui.update_status("❌ Usuario no válido", "error")
             time.sleep(1.5)
-            self.ui.update_status(f"♻️ {self.pending_material.upper()} detectado! Pase su tarjeta NFC para recibir {self.pending_points} puntos", "success")
+            self.ui.update_status(f"♻️ {self.pending_material.upper()} detectado! Pase su tarjeta NFC para recibir {self.pending_points} puntos (Tiempo límite: {POINTS_CLAIM_TIMEOUT}s)", "success")
+
+    def _restart_system(self):
+        """
+        Reinicia el sistema completo limpiando todos los estados
+        """
+        print("🔄 Reiniciando sistema...")
+        
+        # Limpiar material pendiente si existe
+        if self.pending_material is not None:
+            # Eliminar imagen pendiente
+            if self.pending_image_path:
+                self.camera_service.delete_image(self.pending_image_path)
+            
+            self.pending_material = None
+            self.pending_points = 0
+            self.pending_material_time = 0
+            self.pending_image_path = None
+            self.ui.clear_pending_material()
+        
+        # Limpiar sesión activa
+        self.session_active = False
+        self.current_user = None
+        
+        # Reiniciar detección
+        self.detection_active = True
+        
+        # Actualizar UI
+        self.ui.update_status("🔄 Sistema reiniciado - Cámara activa, detectando cambios...", "info")
+        self.ui.update_detection_status("🔄 Cámara activa - Detectando cambios...", "#3498db")
+        
+        print("✅ Sistema reiniciado exitosamente")
 
     def _end_session_by_empty(self):
         """

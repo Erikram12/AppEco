@@ -42,6 +42,11 @@ POINTS_ALUMINUM = 30
 SESSION_DURATION = 20  # segundos
 
 # =========================
+# Configuración de Timeout de Puntos
+# =========================
+POINTS_CLAIM_TIMEOUT = 10  # segundos para reclamar puntos antes del reinicio
+
+# =========================
 # Configuración de UI
 # =========================
 WINDOW_TITLE = "Sistema de Reciclaje Inteligente - Panel de Visualización"
