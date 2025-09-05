@@ -12,7 +12,7 @@
 firebase-admin==6.4.0
 
 # MQTT Client - Para comunicación con sensores
-paho-mqtt==1.6.1
+paho-mqtt>=1.6.0
 
 # OpenCV - Para procesamiento de imágenes y cámara
 opencv-python==4.8.1.78

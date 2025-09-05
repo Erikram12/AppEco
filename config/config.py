@@ -21,7 +21,7 @@ MQTT_TOPIC = os.getenv("MQTT_TOPIC", "reciclaje/+/nivel")  # + = cualquier devic
 # =========================
 # Configuración MQTT para ESP32
 # =========================
-MQTT_MATERIAL_TOPIC = os.getenv("MQTT_MATERIAL_TOPIC", "reciclaje/material/detected")  # Tópico para materiales detectados
+MQTT_MATERIAL_TOPIC = os.getenv("MQTT_MATERIAL_TOPIC", "material/detectado")  # Tópico para materiales detectados
 MQTT_ESP32_TOPIC = os.getenv("MQTT_ESP32_TOPIC", "reciclaje/esp32/command")  # Tópico para comandos a ESP32
 
 # =========================
