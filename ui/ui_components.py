@@ -1,10 +1,9 @@
 """
-Componentes de UI para el Sistema de Reciclaje Inteligente
-=========================================================
+Componentes de UI para el Sistema de Reciclaje Inteligente - Versión LCD
+========================================================================
 
-Este módulo contiene todos los componentes de interfaz de usuario,
-incluyendo la creación de widgets, actualización de estados y
-manejo de la interfaz gráfica.
+Este módulo contiene todos los componentes de interfaz de usuario optimizados
+para pantalla LCD TFT de 320x480 píxeles, mostrando solo información esencial.
 """
 
 import tkinter as tk
@@ -12,16 +11,17 @@ from tkinter import ttk
 import datetime
 from config.config import (
     WINDOW_TITLE, WINDOW_SIZE, WINDOW_BG_COLOR, FRAME_BG_COLOR, TEXT_COLOR,
-    STATUS_COLORS, CONTAINER_COLORS, CONTAINER_EMOJIS
+    STATUS_COLORS, CONTAINER_COLORS, CONTAINER_EMOJIS, COMPACT_MODE,
+    FONT_SIZE_SMALL, FONT_SIZE_MEDIUM, FONT_SIZE_LARGE
 )
 
 
 class UIComponents:
-    """Clase para manejar todos los componentes de la interfaz de usuario"""
+    """Clase para manejar todos los componentes de la interfaz de usuario optimizada para LCD"""
 
     def __init__(self, root):
         """
-        Inicializa los componentes de UI
+        Inicializa los componentes de UI para pantalla LCD
 
         Args:
             root: Ventana principal de Tkinter
@@ -30,6 +30,10 @@ class UIComponents:
         self.root.title(WINDOW_TITLE)
         self.root.geometry(WINDOW_SIZE)
         self.root.configure(bg=WINDOW_BG_COLOR)
+        
+        # Configurar para pantalla completa en LCD
+        self.root.attributes('-fullscreen', True)
+        self.root.resizable(False, False)
 
         # Variables de estado
         self.plastic_count = 0
@@ -44,151 +48,175 @@ class UIComponents:
         self.last_percent_plastico = None
         self.last_percent_aluminio = None
 
-        # Crear todos los widgets
-        self._create_widgets()
+        # Crear todos los widgets optimizados para LCD
+        self._create_compact_widgets()
 
-    def _create_widgets(self):
-        """Crea todos los widgets de la interfaz"""
-        # Frame principal
+    def _create_compact_widgets(self):
+        """Crea widgets optimizados para pantalla LCD de 320x480"""
+        # Frame principal con padding mínimo
         main_frame = tk.Frame(self.root, bg=WINDOW_BG_COLOR)
-        main_frame.pack(fill='both', expand=True, padx=20, pady=20)
+        main_frame.pack(fill='both', expand=True, padx=5, pady=5)
 
-        # Título principal
-        self._create_title(main_frame)
+        # 1. Título compacto (línea 1)
+        self._create_compact_title(main_frame)
 
-        # Estado del sistema
-        self._create_status_section(main_frame)
+        # 2. Estado del sistema (línea 2)
+        self._create_compact_status(main_frame)
 
-        # Información del usuario
-        self._create_user_section(main_frame)
+        # 3. Material pendiente (línea 3-4)
+        self._create_compact_pending(main_frame)
 
-        # Progreso de sesión
-        self._create_session_section(main_frame)
+        # 4. Estadísticas compactas (línea 5)
+        self._create_compact_stats(main_frame)
 
-        # Materiales detectados
-        self._create_materials_section(main_frame)
+        # 5. Estado de componentes (línea 6)
+        self._create_compact_components(main_frame)
 
-        # Estadísticas en tiempo real
-        self._create_stats_section(main_frame)
+        # 6. Log compacto (línea 7-8)
+        self._create_compact_log(main_frame)
 
-        # Estado de componentes
-        self._create_components_section(main_frame)
-
-    def _create_title(self, parent):
-        """Crea el título principal"""
+    def _create_compact_title(self, parent):
+        """Crea título compacto"""
         title_label = tk.Label(
-            parent, text="♻️ SISTEMA DE RECICLAJE INTELIGENTE",
-            font=('Arial', 24, 'bold'), bg=WINDOW_BG_COLOR, fg=TEXT_COLOR
+            parent, text="♻️ RECICLAJE INTELIGENTE",
+            font=('Arial', FONT_SIZE_LARGE, 'bold'), 
+            bg=WINDOW_BG_COLOR, fg=TEXT_COLOR
         )
-        title_label.pack(pady=(0, 20))
+        title_label.pack(pady=2)
 
-    def _create_status_section(self, parent):
-        """Crea la sección de estado del sistema"""
-        status_frame = tk.Frame(parent, bg=FRAME_BG_COLOR, relief='raised', bd=2)
-        status_frame.pack(fill='x', pady=(0, 20))
+    def _create_compact_status(self, parent):
+        """Crea estado del sistema compacto"""
+        status_frame = tk.Frame(parent, bg=FRAME_BG_COLOR, relief='raised', bd=1)
+        status_frame.pack(fill='x', pady=2)
 
-        tk.Label(status_frame, text="📊 ESTADO DEL SISTEMA",
-                 font=('Arial', 16, 'bold'), bg=FRAME_BG_COLOR, fg=TEXT_COLOR).pack(pady=10)
+        self.status_label = tk.Label(
+            status_frame, text="🔄 Iniciando...",
+            font=('Arial', FONT_SIZE_MEDIUM), 
+            bg=FRAME_BG_COLOR, fg='#f39c12'
+        )
+        self.status_label.pack(pady=3)
 
-        self.status_label = tk.Label(status_frame, text="🔄 Iniciando sistema...",
-                                     font=('Arial', 14), bg=FRAME_BG_COLOR, fg='#f39c12')
-        self.status_label.pack(pady=10)
+    def _create_compact_pending(self, parent):
+        """Crea sección de material pendiente compacta"""
+        pending_frame = tk.Frame(parent, bg=FRAME_BG_COLOR, relief='raised', bd=1)
+        pending_frame.pack(fill='x', pady=2)
 
-    def _create_user_section(self, parent):
-        """Crea la sección de información del usuario"""
-        self.user_frame = tk.Frame(parent, bg=FRAME_BG_COLOR, relief='raised', bd=2)
-        self.user_frame.pack(fill='x', pady=(0, 20))
+        # Material detectado
+        self.pending_material_label = tk.Label(
+            pending_frame, text="🔄 Esperando detección...",
+            font=('Arial', FONT_SIZE_MEDIUM, 'bold'), 
+            bg=FRAME_BG_COLOR, fg='#bdc3c7'
+        )
+        self.pending_material_label.pack(pady=2)
 
-        tk.Label(self.user_frame, text="🎯 ESTADO DE DETECCIÓN",
-                 font=('Arial', 16, 'bold'), bg=FRAME_BG_COLOR, fg=TEXT_COLOR).pack(pady=10)
+        # Puntos pendientes
+        self.pending_points_label = tk.Label(
+            pending_frame, text="",
+            font=('Arial', FONT_SIZE_SMALL), 
+            bg=FRAME_BG_COLOR, fg='#f39c12'
+        )
+        self.pending_points_label.pack(pady=1)
 
-        self.user_info_label = tk.Label(self.user_frame, text="🔄 Detectando materiales...",
-                                        font=('Arial', 12), bg=FRAME_BG_COLOR, fg='#3498db')
-        self.user_info_label.pack(pady=10)
+    def _create_compact_stats(self, parent):
+        """Crea estadísticas compactas en una sola línea"""
+        stats_frame = tk.Frame(parent, bg=FRAME_BG_COLOR, relief='raised', bd=1)
+        stats_frame.pack(fill='x', pady=2)
 
-    def _create_session_section(self, parent):
-        """Crea la sección de progreso de sesión"""
-        self.session_frame = tk.Frame(parent, bg=FRAME_BG_COLOR, relief='raised', bd=2)
-        self.session_frame.pack(fill='x', pady=(0, 20))
+        # Frame horizontal para estadísticas
+        stats_content = tk.Frame(stats_frame, bg=FRAME_BG_COLOR)
+        stats_content.pack(pady=2)
 
-        tk.Label(self.session_frame, text="🎁 MATERIAL PENDIENTE",
-                 font=('Arial', 16, 'bold'), bg=FRAME_BG_COLOR, fg=TEXT_COLOR).pack(pady=10)
+        # Plástico
+        self.plastic_count_label = tk.Label(
+            stats_content, text="🥤 0",
+            font=('Arial', FONT_SIZE_SMALL, 'bold'), 
+            bg=FRAME_BG_COLOR, fg='#3498db'
+        )
+        self.plastic_count_label.pack(side='left', padx=5)
 
-        self.session_label = tk.Label(self.session_frame, text="🔄 Esperando detección...",
-                                      font=('Arial', 12), bg=FRAME_BG_COLOR, fg='#bdc3c7')
-        self.session_label.pack(pady=5)
+        # Aluminio
+        self.aluminum_count_label = tk.Label(
+            stats_content, text="🥫 0",
+            font=('Arial', FONT_SIZE_SMALL, 'bold'), 
+            bg=FRAME_BG_COLOR, fg='#95a5a6'
+        )
+        self.aluminum_count_label.pack(side='left', padx=5)
 
-        # Mostrar puntos pendientes
-        self.pending_points_label = tk.Label(self.session_frame, text="",
-                                            font=('Arial', 14, 'bold'), bg=FRAME_BG_COLOR, fg='#f39c12')
-        self.pending_points_label.pack(pady=5)
+        # Puntos totales
+        self.total_points_label = tk.Label(
+            stats_content, text="🏆 0",
+            font=('Arial', FONT_SIZE_SMALL, 'bold'), 
+            bg=FRAME_BG_COLOR, fg='#f39c12'
+        )
+        self.total_points_label.pack(side='left', padx=5)
 
-    def _create_materials_section(self, parent):
-        """Crea la sección de materiales detectados"""
-        materials_frame = tk.Frame(parent, bg=FRAME_BG_COLOR, relief='raised', bd=2)
-        materials_frame.pack(fill='x', pady=(0, 20))
+    def _create_compact_components(self, parent):
+        """Crea estado de componentes compacto"""
+        components_frame = tk.Frame(parent, bg=FRAME_BG_COLOR, relief='raised', bd=1)
+        components_frame.pack(fill='x', pady=2)
 
-        tk.Label(materials_frame, text="📊 MATERIALES DETECTADOS",
-                 font=('Arial', 16, 'bold'), bg=FRAME_BG_COLOR, fg=TEXT_COLOR).pack(pady=10)
+        # Frame horizontal para componentes
+        comp_content = tk.Frame(components_frame, bg=FRAME_BG_COLOR)
+        comp_content.pack(pady=2)
 
-        self.materials_text = tk.Text(materials_frame, height=8, width=60,
-                                      font=('Consolas', 10), bg=WINDOW_BG_COLOR, fg=TEXT_COLOR,
-                                      insertbackground='white', state='disabled')
-        self.materials_text.pack(pady=5, padx=10)
+        # NFC
+        self.nfc_status_label = tk.Label(
+            comp_content, text="🎫 ⏳",
+            font=('Arial', FONT_SIZE_SMALL), 
+            bg=FRAME_BG_COLOR, fg='#f39c12'
+        )
+        self.nfc_status_label.pack(side='left', padx=3)
 
-        scrollbar = tk.Scrollbar(materials_frame, command=self.materials_text.yview)
+        # Cámara
+        self.camera_status_label = tk.Label(
+            comp_content, text="📷 ⏳",
+            font=('Arial', FONT_SIZE_SMALL), 
+            bg=FRAME_BG_COLOR, fg='#f39c12'
+        )
+        self.camera_status_label.pack(side='left', padx=3)
+
+        # MQTT
+        self.mqtt_status_label = tk.Label(
+            comp_content, text="📡 ⏳",
+            font=('Arial', FONT_SIZE_SMALL), 
+            bg=FRAME_BG_COLOR, fg='#f39c12'
+        )
+        self.mqtt_status_label.pack(side='left', padx=3)
+
+        # Firebase
+        self.firebase_status_label = tk.Label(
+            comp_content, text="🔥 ⏳",
+            font=('Arial', FONT_SIZE_SMALL), 
+            bg=FRAME_BG_COLOR, fg='#f39c12'
+        )
+        self.firebase_status_label.pack(side='left', padx=3)
+
+    def _create_compact_log(self, parent):
+        """Crea log compacto con scroll"""
+        log_frame = tk.Frame(parent, bg=FRAME_BG_COLOR, relief='raised', bd=1)
+        log_frame.pack(fill='both', expand=True, pady=2)
+
+        # Título del log
+        tk.Label(
+            log_frame, text="📊 ACTIVIDAD",
+            font=('Arial', FONT_SIZE_SMALL, 'bold'), 
+            bg=FRAME_BG_COLOR, fg=TEXT_COLOR
+        ).pack(pady=1)
+
+        # Text widget compacto
+        self.materials_text = tk.Text(
+            log_frame, height=8, width=35,
+            font=('Consolas', FONT_SIZE_SMALL), 
+            bg=WINDOW_BG_COLOR, fg=TEXT_COLOR,
+            insertbackground='white', state='disabled',
+            wrap='word'
+        )
+        self.materials_text.pack(pady=2, padx=2, fill='both', expand=True)
+
+        # Scrollbar compacta
+        scrollbar = tk.Scrollbar(log_frame, command=self.materials_text.yview)
         scrollbar.pack(side='right', fill='y')
         self.materials_text.config(yscrollcommand=scrollbar.set)
-
-    def _create_stats_section(self, parent):
-        """Crea la sección de estadísticas en tiempo real"""
-        stats_frame = tk.Frame(parent, bg=FRAME_BG_COLOR, relief='raised', bd=2)
-        stats_frame.pack(fill='x', pady=(0, 20))
-
-        tk.Label(stats_frame, text="📈 ESTADÍSTICAS EN TIEMPO REAL",
-                 font=('Arial', 16, 'bold'), bg=FRAME_BG_COLOR, fg=TEXT_COLOR).pack(pady=10)
-
-        stats_content_frame = tk.Frame(stats_frame, bg=FRAME_BG_COLOR)
-        stats_content_frame.pack(pady=10)
-
-        self.plastic_count_label = tk.Label(stats_content_frame, text="🥤 Plástico: 0",
-                                            font=('Arial', 12, 'bold'), bg=FRAME_BG_COLOR, fg='#3498db')
-        self.plastic_count_label.pack(side='left', padx=20)
-
-        self.aluminum_count_label = tk.Label(stats_content_frame, text="🥫 Aluminio: 0",
-                                             font=('Arial', 12, 'bold'), bg=FRAME_BG_COLOR, fg='#95a5a6')
-        self.aluminum_count_label.pack(side='left', padx=20)
-
-        self.total_points_label = tk.Label(stats_content_frame, text="🏆 Puntos Totales: 0",
-                                           font=('Arial', 12, 'bold'), bg=FRAME_BG_COLOR, fg='#f39c12')
-        self.total_points_label.pack(side='left', padx=20)
-
-    def _create_components_section(self, parent):
-        """Crea la sección de estado de componentes"""
-        components_frame = tk.Frame(parent, bg=FRAME_BG_COLOR, relief='raised', bd=2)
-        components_frame.pack(fill='x', pady=(0, 20))
-
-        tk.Label(components_frame, text="🔧 ESTADO DE COMPONENTES",
-                 font=('Arial', 16, 'bold'), bg=FRAME_BG_COLOR, fg=TEXT_COLOR).pack(pady=10)
-
-        components_content_frame = tk.Frame(components_frame, bg=FRAME_BG_COLOR)
-        components_content_frame.pack(pady=10)
-
-        self.nfc_status_label = tk.Label(components_content_frame, text="🎫 NFC: ⏳ Conectando...",
-                                         font=('Arial', 12), bg=FRAME_BG_COLOR, fg='#f39c12')
-        self.nfc_status_label.pack(side='left', padx=20)
-
-        self.camera_status_label = tk.Label(components_content_frame, text="📷 Cámara: ⏳ Conectando...",
-                                            font=('Arial', 12), bg=FRAME_BG_COLOR, fg='#f39c12')
-        self.camera_status_label.pack(side='left', padx=20)
-
-        self.mqtt_status_label = tk.Label(components_content_frame, text="📡 MQTT: ⏳ Conectando...",
-                                          font=('Arial', 12), bg=FRAME_BG_COLOR, fg='#f39c12')
-        self.mqtt_status_label.pack(side='left', padx=20)
-
-        self.firebase_status_label = tk.Label(components_content_frame, text="🔥 Firebase: ⏳ Conectando...",
-                                              font=('Arial', 12), bg=FRAME_BG_COLOR, fg='#f39c12')
-        self.firebase_status_label.pack(side='left', padx=20)
 
     def update_status(self, message, status_type="info"):
         """
@@ -210,12 +238,11 @@ class UIComponents:
             email: Email del usuario autenticado
         """
         self.current_user = email
-        self.user_info_label.config(text=f"👤 Usuario: {email}", fg='#27ae60')
+        # No mostramos email en modo compacto para ahorrar espacio
 
     def clear_user_info(self):
         """Limpia la información del usuario"""
         self.current_user = None
-        self.user_info_label.config(text="⏳ Esperando autenticación...", fg='#bdc3c7')
 
     def update_session_status(self, active=True):
         """
@@ -226,20 +253,17 @@ class UIComponents:
         """
         if active:
             self.session_active = True
-            self.session_label.config(text="🟢 Sesión activa - Detectando materiales...", fg='#27ae60')
         else:
             self.session_active = False
-            self.session_label.config(text="✅ Sesión finalizada", fg='#27ae60')
-            self.progress_var.set(0)
 
     def update_progress(self, progress):
         """
-        Actualiza la barra de progreso
+        Actualiza la barra de progreso (no usado en modo compacto)
 
         Args:
             progress: Valor de progreso (0-100)
         """
-        self.progress_var.set(progress)
+        pass
 
     def update_container_status(self, target, percent, state, distance_cm):
         """
@@ -257,19 +281,19 @@ class UIComponents:
             emoji = CONTAINER_EMOJIS.get(state, "🟢")
 
             # Actualizar el log con información visual
-            container_name = "🥤 Plástico" if target == "contePlastico" else "🥫 Aluminio"
-            log_entry = f"{emoji} {container_name}: {percent}% ({state}) - {distance_cm:.1f}cm\n"
+            container_name = "🥤" if target == "contePlastico" else "🥫"
+            log_entry = f"{emoji} {container_name}: {percent}% ({state})\n"
 
             self.materials_text.config(state='normal')
             self.materials_text.insert('end', log_entry)
             self.materials_text.see('end')
             self.materials_text.config(state='disabled')
 
-            # Actualizar el estado en la UI principal
+            # Actualizar contadores en estadísticas
             if target == "contePlastico":
-                self.plastic_count_label.config(text=f"🥤 Plástico: {self.plastic_count} | {state}", fg=color)
+                self.plastic_count_label.config(text=f"🥤 {self.plastic_count}", fg=color)
             elif target == "conteAluminio":
-                self.aluminum_count_label.config(text=f"🥫 Aluminio: {self.aluminum_count} | {state}", fg=color)
+                self.aluminum_count_label.config(text=f"🥫 {self.aluminum_count}", fg=color)
 
         except Exception as e:
             print(f"❌ Error actualizando estado del contenedor: {e}")
@@ -283,7 +307,7 @@ class UIComponents:
             points: Puntos otorgados
         """
         ts = datetime.datetime.now().strftime("%H:%M:%S")
-        log_entry = f"[{ts}] ♻️ {material.upper()} detectado (+{points} puntos)\n"
+        log_entry = f"[{ts}] ♻️ {material.upper()} (+{points})\n"
 
         self.materials_text.config(state='normal')
         self.materials_text.insert('end', log_entry)
@@ -293,13 +317,13 @@ class UIComponents:
         # Actualizar contadores
         if material == "plastico":
             self.plastic_count += 1
-            self.plastic_count_label.config(text=f"🥤 Plástico: {self.plastic_count}")
+            self.plastic_count_label.config(text=f"🥤 {self.plastic_count}")
         elif material == "aluminio":
             self.aluminum_count += 1
-            self.aluminum_count_label.config(text=f"🥫 Aluminio: {self.aluminum_count}")
+            self.aluminum_count_label.config(text=f"🥫 {self.aluminum_count}")
 
         self.total_points += points
-        self.total_points_label.config(text=f"🏆 Puntos Totales: {self.total_points}")
+        self.total_points_label.config(text=f"🏆 {self.total_points}")
 
     def update_component_status(self, component, status, color):
         """
@@ -310,14 +334,22 @@ class UIComponents:
             status: Estado del componente
             color: Color del estado
         """
+        # Simplificar estados para pantalla pequeña
+        if "✅" in status or "Conectado" in status or "Disponible" in status:
+            status_icon = "✅"
+        elif "❌" in status or "Error" in status or "No disponible" in status:
+            status_icon = "❌"
+        else:
+            status_icon = "⏳"
+
         if component == "nfc":
-            self.nfc_status_label.config(text=f"🎫 NFC: {status}", fg=color)
+            self.nfc_status_label.config(text=f"🎫 {status_icon}", fg=color)
         elif component == "camera":
-            self.camera_status_label.config(text=f"📷 Cámara: {status}", fg=color)
+            self.camera_status_label.config(text=f"📷 {status_icon}", fg=color)
         elif component == "mqtt":
-            self.mqtt_status_label.config(text=f"📡 MQTT: {status}", fg=color)
+            self.mqtt_status_label.config(text=f"📡 {status_icon}", fg=color)
         elif component == "firebase":
-            self.firebase_status_label.config(text=f"🔥 Firebase: {status}", fg=color)
+            self.firebase_status_label.config(text=f"🔥 {status_icon}", fg=color)
 
     def append_material_log(self, label, value, extra=None):
         """
@@ -329,7 +361,7 @@ class UIComponents:
             extra: Información adicional (opcional)
         """
         ts = datetime.datetime.now().strftime("%H:%M:%S")
-        line = f"[{ts}] 📡 {label}: {value}"
+        line = f"[{ts}] {label}: {value}"
         if extra is not None:
             line += f" ({extra})"
         line += "\n"
@@ -393,7 +425,15 @@ class UIComponents:
             status: Estado de la detección
             color: Color del estado
         """
-        self.user_info_label.config(text=status, fg=color)
+        # Simplificar mensaje para pantalla pequeña
+        if "Cámara activa" in status:
+            short_status = "🔄 Detectando..."
+        elif "detectado" in status.lower():
+            short_status = "♻️ Material detectado!"
+        else:
+            short_status = status[:20] + "..." if len(status) > 20 else status
+            
+        self.pending_material_label.config(text=short_status, fg=color)
 
     def update_pending_material(self, material, points):
         """
@@ -404,13 +444,39 @@ class UIComponents:
             points: Puntos a otorgar
         """
         if material:
-            self.session_label.config(text=f"♻️ {material.upper()} detectado!", fg='#27ae60')
-            self.pending_points_label.config(text=f"🎁 {points} puntos pendientes - Pase su tarjeta NFC", fg='#f39c12')
+            self.pending_material_label.config(
+                text=f"♻️ {material.upper()}!", 
+                fg='#27ae60'
+            )
+            self.pending_points_label.config(
+                text=f"🎁 {points} pts - Pase NFC", 
+                fg='#f39c12'
+            )
         else:
-            self.session_label.config(text="🔄 Esperando detección...", fg='#bdc3c7')
+            self.pending_material_label.config(
+                text="🔄 Esperando...", 
+                fg='#bdc3c7'
+            )
             self.pending_points_label.config(text="", fg='#f39c12')
 
     def clear_pending_material(self):
         """Limpia el material pendiente"""
-        self.session_label.config(text="🔄 Esperando detección...", fg='#bdc3c7')
+        self.pending_material_label.config(text="🔄 Esperando...", fg='#bdc3c7')
         self.pending_points_label.config(text="", fg='#f39c12')
+
+    def log_esp32_command(self, material, success=True):
+        """
+        Registra el envío de comando a ESP32
+        
+        Args:
+            material: Material enviado
+            success: Si el envío fue exitoso
+        """
+        ts = datetime.datetime.now().strftime("%H:%M:%S")
+        status_icon = "✅" if success else "❌"
+        log_entry = f"[{ts}] {status_icon} ESP32: {material.upper()}\n"
+
+        self.materials_text.config(state='normal')
+        self.materials_text.insert('end', log_entry)
+        self.materials_text.see('end')
+        self.materials_text.config(state='disabled')

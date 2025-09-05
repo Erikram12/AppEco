@@ -158,6 +158,19 @@ class ReciclajeApp:
         self.pending_material_time = time.time()
         self.pending_image_path = image_path
         
+        # Enviar material detectado a ESP32 para mover compartimientos
+        if self.mqtt_service.is_connected():
+            success = self.mqtt_service.send_material_detected(material, points, image_path)
+            if success:
+                print(f"📡 Material enviado a ESP32: {material}")
+                self.ui.log_esp32_command(material, True)
+            else:
+                print(f"❌ Error enviando material a ESP32: {material}")
+                self.ui.log_esp32_command(material, False)
+        else:
+            print(f"⚠️ MQTT desconectado - No se puede enviar material a ESP32")
+            self.ui.log_esp32_command(material, False)
+        
         # Actualizar UI
         self.ui.update_status(f"♻️ {material.upper()} detectado! Pase su tarjeta NFC para recibir {points} puntos (Tiempo límite: {POINTS_CLAIM_TIMEOUT}s)", "success")
         self.ui.update_pending_material(material, points)

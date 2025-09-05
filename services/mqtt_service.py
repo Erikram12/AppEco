@@ -8,10 +8,12 @@ suscripción a topics y procesamiento de mensajes de los contenedores.
 
 import json
 import ssl
+import time
 import threading
 import paho.mqtt.client as mqtt
 from config.config import (
     MQTT_BROKER, MQTT_PORT, MQTT_USER, MQTT_PASSWORD, MQTT_TOPIC,
+    MQTT_MATERIAL_TOPIC, MQTT_ESP32_TOPIC,
     ALLOWED_TARGETS, ALLOWED_STATES
 )
 
@@ -176,6 +178,95 @@ class MQTTService:
     def is_connected(self):
         """Verifica si está conectado al broker MQTT"""
         return self.connected
+
+    def send_material_detected(self, material, points, image_path=None):
+        """
+        Envía un material detectado a la ESP32 para mover compartimientos
+        
+        Args:
+            material: Tipo de material detectado (plastico, aluminio)
+            points: Puntos otorgados por el material
+            image_path: Ruta de la imagen capturada (opcional)
+        """
+        if not self.connected or not self.client:
+            print("❌ MQTT no conectado - No se puede enviar material")
+            return False
+        
+        try:
+            # Crear mensaje para ESP32
+            message = {
+                "action": "move_compartment",
+                "material": material.lower(),
+                "points": points,
+                "timestamp": int(time.time()),
+                "source": "raspberry_pi"
+            }
+            
+            # Agregar ruta de imagen si existe
+            if image_path:
+                message["image_path"] = image_path
+            
+            # Convertir a JSON
+            payload = json.dumps(message)
+            
+            # Publicar en tópico de materiales detectados
+            result = self.client.publish(MQTT_MATERIAL_TOPIC, payload, qos=1)
+            
+            if result.rc == 0:
+                print(f"✅ Material enviado a ESP32: {material} ({points} pts)")
+                print(f"📡 Tópico: {MQTT_MATERIAL_TOPIC}")
+                print(f"📦 Payload: {payload}")
+                return True
+            else:
+                print(f"❌ Error enviando material: {result.rc}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Error enviando material a ESP32: {e}")
+            return False
+
+    def send_esp32_command(self, command, data=None):
+        """
+        Envía un comando específico a la ESP32
+        
+        Args:
+            command: Comando a enviar (move_plastico, move_aluminio, reset, status)
+            data: Datos adicionales del comando (opcional)
+        """
+        if not self.connected or not self.client:
+            print("❌ MQTT no conectado - No se puede enviar comando")
+            return False
+        
+        try:
+            # Crear mensaje de comando
+            message = {
+                "command": command,
+                "timestamp": int(time.time()),
+                "source": "raspberry_pi"
+            }
+            
+            # Agregar datos adicionales si existen
+            if data:
+                message.update(data)
+            
+            # Convertir a JSON
+            payload = json.dumps(message)
+            
+            # Publicar en tópico de comandos ESP32
+            result = self.client.publish(MQTT_ESP32_TOPIC, payload, qos=1)
+            
+            if result.rc == 0:
+                print(f"✅ Comando enviado a ESP32: {command}")
+                print(f"📡 Tópico: {MQTT_ESP32_TOPIC}")
+                print(f"📦 Payload: {payload}")
+                return True
+            else:
+                print(f"❌ Error enviando comando: {result.rc}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Error enviando comando a ESP32: {e}")
+            return False
 
     def disconnect(self):
         """Desconecta del broker MQTT"""

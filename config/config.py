@@ -19,6 +19,12 @@ MQTT_PASSWORD = os.getenv("MQTT_PASSWORD", "Erikram2025")  # ⚠️ cambia o usa
 MQTT_TOPIC = os.getenv("MQTT_TOPIC", "reciclaje/+/nivel")  # + = cualquier deviceId
 
 # =========================
+# Configuración MQTT para ESP32
+# =========================
+MQTT_MATERIAL_TOPIC = os.getenv("MQTT_MATERIAL_TOPIC", "reciclaje/material/detected")  # Tópico para materiales detectados
+MQTT_ESP32_TOPIC = os.getenv("MQTT_ESP32_TOPIC", "reciclaje/esp32/command")  # Tópico para comandos a ESP32
+
+# =========================
 # Configuración Firebase
 # =========================
 FIREBASE_DB_URL = os.getenv("FIREBASE_DB_URL", "https://resiclaje-39011-default-rtdb.firebaseio.com/")
@@ -50,10 +56,18 @@ POINTS_CLAIM_TIMEOUT = 10  # segundos para reclamar puntos antes del reinicio
 # Configuración de UI
 # =========================
 WINDOW_TITLE = "Sistema de Reciclaje Inteligente - Panel de Visualización"
-WINDOW_SIZE = "900x700"
+WINDOW_SIZE = "320x480"  # Resolución para LCD TFT
 WINDOW_BG_COLOR = '#2c3e50'
 FRAME_BG_COLOR = '#34495e'
 TEXT_COLOR = '#ecf0f1'
+
+# =========================
+# Configuración para Pantalla Pequeña
+# =========================
+COMPACT_MODE = True  # Modo compacto para pantalla LCD
+FONT_SIZE_SMALL = 8
+FONT_SIZE_MEDIUM = 10
+FONT_SIZE_LARGE = 12
 
 # Colores para estados
 STATUS_COLORS = {
